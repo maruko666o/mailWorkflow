@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Feature Set</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 100vh;
+            border: none;
+        }
+        .iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .popup {
+            background: white;
+            width: 40%;
+            height: 40%;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+        }
+        .popup.nameGenerator {
+            width: 60%;
+            height: 30%;
+        }
+        .popup.otp, .popup.makers {
+            width: 90%;
+            height: 90%;
+        }
+        .popup.saveCopied {
+            width: 48%;
+            height: auto;
+        }
+        .popup button {
+            display: block;
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .popup button:hover {
+            background-color: #0056b3;
+        }
+        .popup-buttons {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .popup-buttons button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .popup-buttons button:hover {
+            background-color: #218838;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+    </style>
+    <script>
+        let usedFirstNames = [];
+        let usedLastNames = [];
+
+        function openPopup(type) {
+            if (type === 'nameGenerator') {
+                document.querySelector('.popup-overlay.nameGenerator').style.display = 'flex';
+            } else if (type === 'otp') {
+                document.querySelector('.popup-overlay.otp').style.display = 'flex';
+            } else if (type === 'makers') {
+                document.querySelector('.popup-overlay.makers').style.display = 'flex';
+            } else if (type === 'saveCopied') {
+                document.querySelector('.popup-overlay.saveCopied').style.display = 'flex';
+            }
+
+            document.querySelector('.popup-buttons').style.display = 'none';
+        }
+
+        function closePopup(event, type) {
+            const popupOverlay = document.querySelector(`.popup-overlay.${type}`);
+            if (event.target === popupOverlay) {
+                popupOverlay.style.display = 'none';
+            }
+            document.querySelector('.popup-buttons').style.display = 'flex';
+        }
+
+        function generateName() {
+         const firstNames = [
+    "Aelithar", "Baldrith", "Celesian", "Draxalon", "Eldirion", "Fyralon", "Ghyrith", "Helrion", "Ithalos", "Javareth",
+    "Kaelith", "Lyrithar", "Mythalor", "Nyxian", "Orinax", "Phaelith", "Qalorin", "Ravelyn", "Sylrith", "Thaloria",
+    "Urothar", "Vyreth", "Xylior", "Ylithar", "Zorathian", "Alithan", "Brystos", "Caelisar", "Dyrosian", "Elythar",
+    "Fyranix", "Galendros", "Haldalon", "Irionix", "Jorathis", "Kharalon", "Luronis", "Morithar", "Nythalor", "Orionis",
+    "Phaerith", "Qurielos", "Rylionis", "Syrathos", "Tyrathos", "Ulkarian", "Vasharan", "Wyrithian", "Xeridion", "Ydranion",
+    "Zylorion", "Asphariel", "Berynith", "Cavindros", "Dhalithar", "Enthonis", "Faelithar", "Ghaladros", "Ithalion", "Jhavirus",
+    "Kyralith", "Lorathian", "Meldrosian", "Nythari", "Odrithos", "Phirionis", "Quarionix", "Rivarian", "Sethariel", "Tharalion",
+    "Uvirian", "Valnithar", "Woltharion", "Xalrith", "Yithon", "Zyranix", "Alythar", "Braethion", "Caldoran", "Dhalian",
+    "Elironis", "Fhaderon", "Grathar", "Hyralion", "Ilthirion", "Joviral", "Kaldorion", "Lorathiel", "Myrithar", "Nylarian",
+    "Osalith", "Pherinon", "Quarionos", "Ryvion", "Solthar", "Tylrosian", "Urionis", "Vallian", "Wyrarion", "Xaloriel",
+    "Ylathar", "Zylarion", "Anarion", "Baldarion", "Cythalor", "Derrith", "Emarion", "Fylrith", "Gythor", "Harven",
+    "Irithan", "Jalithos", "Kaldrian", "Lirosian", "Mavirith", "Nadriel", "Orathar", "Phelian", "Qarion", "Rylithan",
+    "Stareth", "Tharivon", "Ulmarion", "Valeth", "Xelrith", "Yhyrion", "Zafarin", "Astrael", "Berythar", "Cyronis",
+    "Darenth", "Erioth", "Falorin", "Gyrathor", "Hathar", "Irlor", "Jolthor", "Kaldros", "Lyndros", "Mireth",
+    "Nevarian", "Otharian", "Pheron", "Qylar", "Ryndros", "Salthar", "Trysthar", "Utharion", "Vornath", "Weldar",
+    "Xarith", "Ylvorian", "Zytheros", "Alyron", "Brynol", "Calthian", "Dothar", "Evaros", "Firon", "Galrith",
+    "Haldros", "Irlian", "Jalithar", "Kylath", "Larian", "Myril", "Nivarian", "Orlan", "Pherith", "Quaril",
+    "Rylor", "Sythan", "Torel", "Urithan", "Valdros", "Wyren", "Xaralon", "Ylionar", "Zythan"   ,  "Xylos", "Avelis", "Dharith", "Zanros", "Ithariel", "Elionas", "Varek", "Rhyson", "Vornyx", "Seltharion",
+    "Thalos", "Myralith", "Zephoron", "Qyrian", "Kharavon", "Elisar", "Ylothar", "Ferenos", "Haldryn", "Mithalion",
+    "Zorathos", "Jorithar", "Nyvenar", "Torvenis", "Shalior", "Ravithan", "Kylaron", "Sarion", "Zirithos", "Virethar",
+    "Ultharion", "Elkieran", "Rylorian", "Fylisar", "Khorinth", "Zalynthar", "Hyranith", "Velarion", "Omryn", "Raelan",
+    "Vyranthe", "Rygaroth", "Hathir", "Xenathar", "Viralith", "Zephran", "Arothian", "Lyros", "Ralrion", "Dhanariel",
+    "Kaldros", "Vorithian", "Mekiel", "Galtharion", "Feylar", "Thrainas", "Velindros", "Urosar", "Selkarin", "Zarionis",
+    "Alkathon", "Qalrix", "Ithylon", "Rethalion", "Valiron", "Maldros", "Therion", "Arlyth", "Xanlor", "Halythar",
+    "Valaris", "Zephari", "Thyronis", "Jydros", "Qylaron", "Venthior", "Cymarion", "Loriel", "Barithos", "Xanthanor",
+    "Zaryon", "Rhylith", "Quaralon", "Nerithar", "Fyralonis", "Ravion", "Zethalan", "Askarian", "Nytharion", "Halrithos",
+    "Vandros", "Yserian", "Zelrith", "Ulthiros", "Khalarion", "Vallithar", "Thalrith", "Fynarion", "Xilaron", "Ylianar",
+    "Anasthar", "Irivalith", "Eldalor", "Litharion", "Rynarion", "Zandros", "Berion", "Hystar", "Virosian", "Lythalon",
+    "Thalir", "Elkith", "Phaelithar", "Zylaron", "Dravion", "Volarin", "Sylthar", "Hyrionis", "Lorathos", "Kirilith",
+    "Syralon", "Vandalan", "Dystros", "Kallisar", "Orithan", "Tirithos", "Felyrion", "Raethor", "Votharion", "Asmarion"
+];
+
+const lastNames = [
+    "Alfaro", "Benavides", "Cabrera", "Delos Reyes", "Esquivel", "Figueroa", "Guzmán", "Hernandez", "Islas", "Jaramillo",
+    "López", "Marqués", "Navarro", "Ortega", "Pérez", "Quintero", "Ramírez", "Serrano", "Torres", "Valencia",
+    "Ximénez", "Ybanez", "Zaragoza", "Alcaraz", "Bautista", "Caballero", "De la Cruz", "Espinoza", "Fuentes", "Gonzales",
+    "Hidalgo", "Ibarra", "Jurado", "Kastilla", "Llorente", "Martinez", "Noriega", "Ocampo", "Pascual", "Quevedo",
+    "Ríos", "Sánchez", "Tadeo", "Uribe", "Vazquez", "Zapata", "Aguirre", "Bermúdez", "Cisneros", "Díaz",
+    "Elizalde", "Fuentes", "Garrido", "Hernández", "Iglesias", "Javier", "Kavilan", "Linares", "Molina", "Navarrete",
+    "Ocampo", "Pineda", "Ramos", "Serrano", "Tovar", "Urquiza", "Villasenor", "Wong", "Xerxes", "Yanez",
+    "Zalazar", "Aguillar", "Berrocal", "Cortés", "Delgado", "Escobar", "Falcón", "Garrido", "Herrera", "López",
+    "Mendoza", "Nieto", "Oliva", "Pérez", "Rivas", "Serrano", "Torres", "Vázquez", "Zamora", "Aguilar", "Bermudez",
+    "Cabrera", "Dávila", "Estrada", "Figueroa", "García", "Hernandez", "Ibarra", "Jovellanos", "Kastilla", "Llorente",
+    "Méndez", "Núñez", "Ocampo", "Palacios", "Quintana", "Ramírez", "Sánchez", "Torres", "Varela", "Zabala",
+    "Alvarez", "Blanco", "Colón", "Díaz", "Escudero", "Fernández", "González", "Hidalgo", "Izquierdo", "Javier",
+    "Kavilan", "Linares", "Martínez", "Noriega", "Oliva", "Pardo", "Quevedo", "Rivas", "Serrano", "Tadeo",
+    "Uribe", "Vega", "Ximénez", "Yanez", "Zapata", "Acosta", "Báez", "Castilla", "Dominguez", "Echavez", "Franco",
+    "Gil", "Herrera", "Izquierdo", "Jaramillo", "López", "Molina", "Núñez", "Ortiz", "Pérez", "Ramírez" , "Beltran", "Varela", "Flores", "Hidalgo", "Solano", "Coronado", "Jimenez", "Chavez", "Fresno", "Gomez",
+    "Lozano", "Serrato", "Zapata", "Martinez", "Mendoza", "Villanueva", "Moreno", "Sierra", "Santana", "Vargas",
+    "Reyes", "Ramirez", "Ortega", "Alvarado", "Díaz", "Marquez", "Navarro", "Gonzalez", "Padilla", "Luna",
+    "Alonso", "Ruiz", "Morales", "Rosales", "Carbajal", "Pacheco", "Mora", "Arroyo", "Rodriguez", "Aranda",
+    "Castillo", "Hernandez", "Cervantes", "Campos", "Bravo", "Guerra", "Bermúdez", "Arias", "Salazar", "Rios",
+    "Molina", "Guzman", "Bautista", "Jaramillo", "Solis", "Contreras", "Soto", "Ruiz", "Aragon", "Camacho",
+    "Figueroa", "Carrillo", "Tellez", "Orozco", "Martinez", "Peña", "Paredes", "Montero", "García", "Ferrer",
+    "Riviera", "Esteban", "Castaneda", "Menendez", "De la Cruz", "Vidal", "Brito", "Vargas", "Herrera", "Ramos",
+    "Bravo", "Cortés", "Montoya", "Trujillo", "Sierra", "Delgado", "Blanco", "Pinto", "Ramiro", "Aguilar",
+    "Garza", "Méndez", "Vega", "Pérez", "Herrera", "Alvarado", "Velasco", "Gonzales", "Rey", "Alba",
+    "Calderon", "Pérez", "Olmedo", "Aguirre", "Parra", "Valle", "Méndez", "Romero", "Jovellanos", "Zúñiga",
+    "Flores", "López", "Acevedo", "Villanueva", "Barajas", "Mata", "Aguirrez", "Ríos", "Paz", "Zaragoza",
+    "Diaz", "Maldonado", "Hernández", "Serrano", "Gallegos", "Cuéllar", "Orozco", "Monroy", "Hidalgo", "Paniagua",
+    "Vargas", "Cordero", "Santillan", "Chavez", "Muñoz", "Saavedra", "Tejada", "Hernandez", "Acevedo", "De la Torre",
+    "Medina", "Figueroa", "Zamora", "Moreno", "Gonzales", "Tobar", "Arévalo", "Salas", "Valenzuela", "Luna",
+    "Garcia", "Rodríguez", "Mendez", "Serrano", "Ruiz", "Cuesta", "Salazar", "De la Cruz", "Gonzalo", "Blanco"
+];
+
+            // Filter out used names
+            const availableFirstNames = firstNames.filter(name => !usedFirstNames.includes(name));
+            const availableLastNames = lastNames.filter(name => !usedLastNames.includes(name));
+
+            if (availableFirstNames.length === 0 || availableLastNames.length === 0) {
+                document.getElementById('generatedName').innerText = "No longer can generate";
+                document.getElementById('copyButton').style.display = 'none';
+                return;
+            }
+
+            const firstName = availableFirstNames[Math.floor(Math.random() * availableFirstNames.length)];
+            const lastName = availableLastNames[Math.floor(Math.random() * availableLastNames.length)];
+
+            // Mark these names as used
+            usedFirstNames.push(firstName);
+            usedLastNames.push(lastName);
+
+            const generatedName = `${firstName}.${lastName}`;
+
+            document.getElementById('generatedName').innerText = generatedName;
+            document.getElementById('copyButton').style.display = 'inline-block';
+        }
+
+        function copyToClipboard() {
+            const textToCopy = document.getElementById('generatedName').innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert("Copied: " + textToCopy);
+            }).catch(err => {
+                console.error("Failed to copy text: ", err);
+            });
+        }
+
+        function saveCopiedText() {
+            const textToSave = document.getElementById('copiedText').value;
+            const blob = new Blob([textToSave], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'copied_text.txt';
+            link.click();
+        }
+
+        function pasteText() {
+            navigator.clipboard.readText().then(text => {
+                const currentText = document.getElementById('copiedText').value;
+                document.getElementById('copiedText').value = currentText + "\n" + text;
+            }).catch(err => {
+                console.error("Failed to paste text: ", err);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="iframe-container">
+        <iframe src="https://generator.email/"></iframe>
+    </div>
+
+    <!-- Popup for Name Generator -->
+    <div class="popup-overlay nameGenerator" onclick="closePopup(event, 'nameGenerator')">
+        <div class="popup nameGenerator">
+            <button onclick="generateName()">Generate Name</button>
+            <div id="generatedName" style="font-size: 20px; margin-bottom: 10px;">FirstName.LastName</div>
+            <button id="copyButton" style="display:none;" onclick="copyToClipboard()">Copy Generated Name</button>
+        </div>
+    </div>
+
+    <!-- Popup for OTP Website -->
+    <div class="popup-overlay otp" onclick="closePopup(event, 'otp')">
+        <div class="popup otp">
+            <iframe src="https://otp.hothothot.workers.dev/" width="100%" height="100%"></iframe>
+        </div>
+    </div>
+
+    <!-- Popup for Makers Website -->
+    <div class="popup-overlay makers" onclick="closePopup(event, 'makers')">
+        <div class="popup makers">
+            <iframe src="https://makers4.hothothot.workers.dev" width="100%" height="100%"></iframe>
+        </div>
+    </div>
+
+    <!-- Popup for Save Copied Text -->
+    <div class="popup-overlay saveCopied" onclick="closePopup(event, 'saveCopied')">
+        <div class="popup saveCopied">
+            <textarea id="copiedText" placeholder="Paste your copied text here"></textarea>
+            <button onclick="pasteText()">Paste Text</button>
+            <button onclick="saveCopiedText()">Save as Text File</button>
+        </div>
+    </div>
+
+    <!-- Floating Buttons -->
+    <div class="popup-buttons">
+        <button onclick="openPopup('nameGenerator')">Name Generator</button>
+        <button onclick="openPopup('otp')">OTP Website</button>
+        <button onclick="openPopup('makers')">Makers Website</button>
+        <button onclick="openPopup('saveCopied')">Save Copied Text</button>
+    </div>
+</body>
+</html>
