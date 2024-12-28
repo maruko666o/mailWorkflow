@@ -34,31 +34,27 @@
         }
         .popup {
             background: white;
-            width: 40%;
-            height: 40%;
+            width: 60%;
+            height: auto;
             border-radius: 10px;
             padding: 20px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
             overflow-y: auto;
             position: relative;
         }
-        .popup.nameGenerator {
-            width: 60%;
-            height: 30%;
+        .popup h1 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
         }
-        .popup.otp, .popup.makers {
-            width: 90%;
-            height: 90%;
-        }
-        .popup.saveCopied {
-            width: 48%;
-            height: auto;
+        .popup textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
         }
         .popup button {
-            display: block;
-            margin-bottom: 10px;
             padding: 10px 15px;
             font-size: 14px;
             cursor: pointer;
@@ -90,42 +86,67 @@
         .popup-buttons button:hover {
             background-color: #218838;
         }
-        textarea {
-            width: 100%;
-            height: 100px;
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
     </style>
     <script>
-        let usedFirstNames = [];
-        let usedLastNames = [];
-
         function openPopup(type) {
-            if (type === 'nameGenerator') {
-                document.querySelector('.popup-overlay.nameGenerator').style.display = 'flex';
-            } else if (type === 'otp') {
-                document.querySelector('.popup-overlay.otp').style.display = 'flex';
-            } else if (type === 'makers') {
-                document.querySelector('.popup-overlay.makers').style.display = 'flex';
-            } else if (type === 'saveCopied') {
-                document.querySelector('.popup-overlay.saveCopied').style.display = 'flex';
-            }
-
+            const overlay = document.querySelector(`.popup-overlay.${type}`);
+            overlay.style.display = 'flex';
             document.querySelector('.popup-buttons').style.display = 'none';
         }
 
         function closePopup(event, type) {
-            const popupOverlay = document.querySelector(`.popup-overlay.${type}`);
-            if (event.target === popupOverlay) {
-                popupOverlay.style.display = 'none';
+            const overlay = document.querySelector(`.popup-overlay.${type}`);
+            if (event.target === overlay) {
+                overlay.style.display = 'none';
+                document.querySelector('.popup-buttons').style.display = 'flex';
             }
-            document.querySelector('.popup-buttons').style.display = 'flex';
         }
 
-        function generateName() {
+        function pasteEmail() {
+            navigator.clipboard.readText().then((text) => {
+                const emailContainer = document.getElementById('emailContainer');
+                emailContainer.value += text.trim() + '\n';
+            }).catch((err) => {
+                alert("Failed to paste. Please allow clipboard access.");
+                console.error(err);
+            });
+        }
+
+        function processEmails() {
+            const emailContainer = document.getElementById('emailContainer');
+            const emails = emailContainer.value.trim().split('\n');
+
+            if (emails.length === 0 || emails[0].trim() === '') {
+                alert("Please paste at least one email.");
+                return;
+            }
+
+            const recentEmail = emails[emails.length - 1].trim();
+
+            if (recentEmail.includes('@')) {
+                const [username, domain] = recentEmail.split('@');
+                const url = `https://generator.email/${domain}/${username}`;
+                document.getElementById('result').innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+                window.open(url, '_blank');
+                window.location.href = 'https://makers4.hothothot.workers.dev'; // Redirecting to the desired URL
+                saveEmailsToFile(emails);
+            } else {
+                alert("The most recent email is invalid. Please check your input.");
+            }
+        }
+
+        function saveEmailsToFile(emails) {
+            const blob = new Blob([emails.join('\n')], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'emails.txt';
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        // Name Generation Logic
+        
+        
 const firstNames = [
     "Aelithar", "Baldrith", "Cyrandor", "Velorith", "Thalowen", "Eryndale", "Lyronar", "Zerathyn", "Kaldris", "Myrathen", 
     "Valdrien", "Fenloran", "Thrymallis", "Zylphar", "Elvior", "Drakenwyn", "Shaltheris", "Vyndelle", "Norviel", "Klyorath", 
@@ -158,8 +179,12 @@ const lastNames = [
     "Tlaltepactli", "Quauhtli", "Tepeyacac", "Zitlaltepec", "Cihuateteo", "Tlachihualtepetl", "Itzacoatl", "Ahuehuetl", "Cuicatecatl", "Ahuacatl",
     "Xihuacoatl", "Poyauhtli", "Metztitlan", "Quaxalotl", "Tezontli", "Chalco", "Tetzcoco", "Tlilxochitl", "Tzompa", "Mixquiahuala"
 ];
+        
+        
+        const usedFirstNames = [];
+        const usedLastNames = [];
 
-            // Filter out used names
+        function generateName() {
             const availableFirstNames = firstNames.filter(name => !usedFirstNames.includes(name));
             const availableLastNames = lastNames.filter(name => !usedLastNames.includes(name));
 
@@ -182,77 +207,48 @@ const lastNames = [
             document.getElementById('copyButton').style.display = 'inline-block';
         }
 
-        function copyToClipboard() {
-            const textToCopy = document.getElementById('generatedName').innerText;
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                alert("Copied: " + textToCopy);
-            }).catch(err => {
-                console.error("Failed to copy text: ", err);
-            });
-        }
-
-        function saveCopiedText() {
-            const textToSave = document.getElementById('copiedText').value;
-            const blob = new Blob([textToSave], { type: 'text/plain' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'copied_text.txt';
-            link.click();
-        }
-
-        function pasteText() {
-            navigator.clipboard.readText().then(text => {
-                const currentText = document.getElementById('copiedText').value;
-                document.getElementById('copiedText').value = currentText + "\n" + text;
-            }).catch(err => {
-                console.error("Failed to paste text: ", err);
+        function copyGeneratedName() {
+            const generatedName = document.getElementById('generatedName').innerText;
+            navigator.clipboard.writeText(generatedName).then(() => {
+                alert('Name copied to clipboard!');
             });
         }
     </script>
 </head>
 <body>
+    <!-- Main Interface -->
     <div class="iframe-container">
-        <iframe src="https://generator.email/"></iframe>
+        <iframe src="https://generator.email"></iframe>
     </div>
 
-    <!-- Popup for Name Generator -->
+    <!-- Popup Overlay for Email Generator -->
+    <div class="popup-overlay emailGenerator" onclick="closePopup(event, 'emailGenerator')">
+        <div class="popup">
+            <h1>Email to URL Generator</h1>
+            <label for="email">Paste emails here (one per line):</label>
+            <textarea id="emailContainer" placeholder="Paste emails here..."></textarea>
+            <div style="margin-top: 10px;">
+                <button onclick="pasteEmail()">Paste</button>
+                <button onclick="processEmails()">See Inbox</button>
+            </div>
+            <p id="result"></p>
+        </div>
+    </div>
+
+    <!-- Popup Overlay for Name Generator -->
     <div class="popup-overlay nameGenerator" onclick="closePopup(event, 'nameGenerator')">
-        <div class="popup nameGenerator">
+        <div class="popup">
+            <h1>Generated Name</h1>
+            <p id="generatedName">Click the button to generate a name.</p>
             <button onclick="generateName()">Generate Name</button>
-            <div id="generatedName" style="font-size: 20px; margin-bottom: 10px;">FirstName.LastName</div>
-            <button id="copyButton" style="display:none;" onclick="copyToClipboard()">Copy Generated Name</button>
+            <button id="copyButton" onclick="copyGeneratedName()" style="display:none;">Copy Name</button>
         </div>
     </div>
 
-    <!-- Popup for OTP Website -->
-    <div class="popup-overlay otp" onclick="closePopup(event, 'otp')">
-        <div class="popup otp">
-            <iframe src="https://otp.hothothot.workers.dev/" width="100%" height="100%"></iframe>
-        </div>
-    </div>
-
-    <!-- Popup for Makers Website -->
-    <div class="popup-overlay makers" onclick="closePopup(event, 'makers')">
-        <div class="popup makers">
-            <iframe src="https://makers4.hothothot.workers.dev" width="100%" height="100%"></iframe>
-        </div>
-    </div>
-
-    <!-- Popup for Save Copied Text -->
-    <div class="popup-overlay saveCopied" onclick="closePopup(event, 'saveCopied')">
-        <div class="popup saveCopied">
-            <textarea id="copiedText" placeholder="Paste your copied text here"></textarea>
-            <button onclick="pasteText()">Paste Text</button>
-            <button onclick="saveCopiedText()">Save as Text File</button>
-        </div>
-    </div>
-
-    <!-- Floating Buttons -->
+    <!-- Popup Buttons -->
     <div class="popup-buttons">
-        <button onclick="openPopup('nameGenerator')">Name Generator</button>
-        <button onclick="openPopup('otp')">OTP Website</button>
-        <button onclick="openPopup('makers')">Makers Website</button>
-        <button onclick="openPopup('saveCopied')">Save Copied Text</button>
+        <button onclick="openPopup('emailGenerator')">Save your Emails</button>
+        <button onclick="openPopup('nameGenerator')">Open Name Generator</button>
     </div>
 </body>
 </html>
