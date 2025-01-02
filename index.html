@@ -1,425 +1,402 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complete Feature Set</title>
+    <title>Random Email Generator</title>
     <style>
-        body {
+        * {
             margin: 0;
-            font-family: Arial, sans-serif;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
             overflow: hidden;
         }
-        .iframe-container {
-            width: 100%;
-            height: 100vh;
-            border: none;
-        }
-        .iframe-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        .popup-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .popup {
-            background: white;
-            width: 60%;
-            height: auto;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            overflow-y: auto;
-            position: relative;
-        }
-        .popup h1 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-        }
-        .popup textarea {
-            width: 100%;
-            height: 100px;
-            margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        .popup button {
-            padding: 10px 15px;
-            font-size: 14px;
-            cursor: pointer;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-        .popup button:hover {
-            background-color: #0056b3;
-        }
-        .popup-buttons {
-            position: fixed;
-            right: 20px;
-            bottom: 20px;
-            z-index: 1001;
+
+        body {
+            font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            background-color: #f0f0f0;
         }
-        .popup-buttons button {
+
+        iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+        }
+
+        .email-generator {
+            height: 150px;
+            padding: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .email-generator p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .email-generator button {
             padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin: 5px;
+        }
+
+        .email-display {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #333;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        #saveBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 8px 12px;
             background-color: #28a745;
             color: white;
+            font-size: 12px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
-        .popup-buttons button:hover {
-            background-color: #218838;
-        }
     </style>
-    <script>
-        function openPopup(type) {
-            const overlay = document.querySelector(`.popup-overlay.${type}`);
-            overlay.style.display = 'flex';
-            document.querySelector('.popup-buttons').style.display = 'none';
-        }
-
-        function closePopup(event, type) {
-            const overlay = document.querySelector(`.popup-overlay.${type}`);
-            if (event.target === overlay) {
-                overlay.style.display = 'none';
-                document.querySelector('.popup-buttons').style.display = 'flex';
-            }
-        }
-
-        function pasteEmail() {
-            navigator.clipboard.readText().then((text) => {
-                const emailContainer = document.getElementById('emailContainer');
-                emailContainer.value += text.trim() + '\n';
-            }).catch((err) => {
-                alert("Failed to paste. Please allow clipboard access.");
-                console.error(err);
-            });
-        }
-
-        function processEmails() {
-            const emailContainer = document.getElementById('emailContainer');
-            const emails = emailContainer.value.trim().split('\n');
-
-            if (emails.length === 0 || emails[0].trim() === '') {
-                alert("Please paste at least one email.");
-                return;
-            }
-
-            const recentEmail = emails[emails.length - 1].trim();
-
-            if (recentEmail.includes('@')) {
-                const [username, domain] = recentEmail.split('@');
-                const url = `https://generator.email/${domain}/${username}`;
-                document.getElementById('result').innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
-                window.open(url, '_blank');
-                window.location.href = 'https://makers5.hothothot.workers.dev'; // Redirecting to the desired URL
-                saveEmailsToFile(emails);
-            } else {
-                alert("The most recent email is invalid. Please check your input.");
-            }
-        }
-
-        function saveEmailsToFile(emails) {
-            const blob = new Blob([emails.join('\n')], { type: 'text/plain' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'emails.txt';
-            link.click();
-            URL.revokeObjectURL(link.href);
-        }
-
-        // Name Generation Logic
-        
-        
-const firstNames = [
-"Solirana", "Lunarese", "Astrevia", "Valencora", "Florivena", 
-"Celestino", "Marivela", "Ventario", "Rosalithia", "Terranova", 
-"Esmerlith", "Aurenzo", "Fioravante", "Montestela", "Venezora", 
-"Zafíria", "Lazulore", "Ombriano", "Rubisea", "Etervina", 
-"Altabella", "Granithon", "Boscovera", "Lagomara", "Verdelith", 
-"Salviora", "Maribrisa", "Nebuliano", "Corvistra", "Fuentaria", 
-"Stellanzo", "Velviera", "Azzuriven", "Piedralejo", "Florisento", 
-"Lunavalle", "Nerevía", "Silvatera", "Aquastila", "Cumbresca", 
-"Zenirian", "Tempestra", "Aurivento", "Rosadura", "Brumestia", 
-"Montelirio", "Rocavena", "Elyzaria", "Armonthos", "Fioribella", 
-"Diamarina", "Lunaregio", "Sombresta", "Lucivenia", "Alpianor", 
-"Nubilena", "Terranova", "Serravida", "Castavelle", "Estrellan", 
-"Selvoria", "Glacirith", "Arenoria", "Nubilaris", "Saphirida", 
-"Vallisura", "Ventorion", "Cavallith", "Fioranox", "Maristella", 
-"Oceathis", "Crystiven", "Rocaviel", "Amatrisco", "Estelvero", 
-"Alforena", "Cielvante", "Lunafino", "Alessuna", "Brisafonte", 
-"Fioresta", "Montielva", "Glorivena", "Silvanica", "Terraluz", 
-"Rubivello", "Ardastria", "Marevolta", "Lagovera", "Lumivara", 
-"Cristolina", "Ventiscan", "Nebulistra", "Altavencia", "Vallorica", 
-"Elyzandro", "Brumescora", "Lunavico", "Corazentia", "Nostralia", 
-"Aquilera", "Celestara", "Serenvalo", "Zafireno", "Terrastel", 
-"Alborizia", "Ventriano", "Montelena", "Piedraluz", "Rosavelle", 
-"Florianis", "Cielovina", "Verdibrisa", "Maranotte", "Nerestela", 
-"Lazuritho", "Lucivaria", "Alcestina", "Lagorena", "Diamorin", 
-"Vallonaro", "Soliviento", "Serrarose", "Rocavilera", "Tempestia", 
-"Astrolina", "Glorivella", "Aurenasta", "Fioranoza", "Sombrynn", 
-"Silvestra", "Lunasterio", "Castaverna", "Nereluna", "Floravida", 
-"Aquavilla", "Ombrenzo", "Cumbresio", "Brisarese", "Arcanitha", 
-"Zafiriada", "Elyzante", "Nebularis", "Marivento", "Fiorenzo", 
-"Estrellia", "Ambrilith", "Celestorna", "Velloresta", "Alpinora", 
-"Diamara", "Lucivera", "Rubianna", "Montivara", "Silvanior", 
-"Solalith", "Lunavenza", "Aurenilo", "Fioricel", "Cielosuna", 
-"Aquarilith", "Zafiroza", "Terralium", "Nubilitho", "Altimira", 
-"Florirella", "Brumelion", "Ventiscania", "Rocaverna", "Lazulona", 
-"Serravida", "Piedrasto", "Lunaverde", "Esmerthas", "Sombrenza", 
-"Arcanisvo", "Marilesta", "Fuentario", "Vellazul", "Castoviera", 
-"Solistena", "Nebulonix", "Montarino", "Zenirielle", "Terradorna", 
-"Rocaverde", "Alborvena", "Cumbresla", "Verdianor", "Rubisaria", 
-"Sapphiris", "Maribella", "Lagoforte", "Celestoria", "Diamarese", 
-"Silvaniso", "Lunazaria", "Tempestoro", "Aquenelia", "Floraluz", 
-"Zafirole", "Montavento", "Auristelio", "Cavallaro", "Esterluna", 
-"Altamirio", "Piedramor", "Ventestio", "Sapphivale", "Ardazul", 
-"Verdestia", "Serenella", "Cielorema", "Alpinoro", "Maravena",
-    
-"Alamindu", "Batumarah", "Kipilana", "Tigunareh", "Sinangila", 
-"Lumitalah", "Daraquar", "Panginara", "Rimbonikah", "Taluniah", 
-"Jelawatir", "Lianokar", "Kuyarisa", "Teniriah", "Tumbolika", 
-"Langgiman", "Silapohar", "Lukaritah", "Pangayek", "Rimbanira", 
-"Ambuyira", "Tingaron", "Manasura", "Sumbiritah", "Palukina", 
-"Lupitanah", "Bayorika", "Pasiquor", "Santuwah", "Balayora", 
-"Rumboriza", "Sitaluna", "Danumiah", "Lakatonik", "Kutanirah", 
-"Sanganah", "Lumpuras", "Barakinah", "Rangasari", "Punayirah", 
-"Selarika", "Bakatunai", "Kabuyarah", "Rungkua", "Payahiru", 
-"Ambalika", "Kuyakina", "Pindokan", "Selaribu", "Landiorah", 
-"Parakina", "Telokiah", "Urayinah", "Rimbulak", "Talikina", 
-"Lintakun", "Payanisa", "Beraugor", "Kuyandah", "Lupakiah", 
-"Renggukah", "Sapariza", "Jelamiah", "Pujayarah", "Lakansura", 
-"Binuangah", "Taluniza", "Bubukina", "Kanayang", "Lintahun", 
-"Rintangor", "Lumpuhir", "Tamawiqa", "Binusanah", "Jatunarah", 
-"Telanguar", "Beraugir", "Seladisa", "Malisura", "Ambunira", 
-"Tunggayar", "Binadeka", "Tabayuah", "Rungkinar", "Sumpulan", 
-"Rimatuka", "Pindoriza", "Tagarira", "Lanangan", "Sikutarah", 
-"Lupikina", "Rimaurah", "Binayira", "Sengkuan", "Lakantua", 
-"Burungan", "Santuhir", "Kanayang", "Lumuwiah", "Sipatiku", 
-"Piningah", "Kuyamuna", "Ambokian", "Luntoran", "Paluwanah", 
-"Rungutan", "Balaguna", "Tuminira", "Lintanik", "Sumbayan", 
-"Payoriza", "Pinonika", "Rengkarah", "Bumbirai", "Ambuyirah", 
-"Jelakona", "Landikor", "Binumbah", "Rintakah", "Tumpukan", 
-"Silariza", "Rungkiwar", "Tagarisa", "Ambasira", "Santuyah", 
-"Jelatuka", "Tanjurah", "Batiqana", "Sangonah", "Lakatura", 
-"Tabeyira", "Ambutan", "Payaniko", "Lintiroh", "Paluyika", 
-"Telahunah", "Rintayan", "Langkurah", "Batoyira", "Tagunrah", 
-"Rimahora", "Kutanika", "Pindonoh", "Talayuka", "Jatunayah", 
-"Lumpiyan", "Santuwik", "Payandah", "Tumbonah", "Batumirah", 
-"Landirah", "Rimpakua", "Sungkitah", "Langkuwan", "Lakantoh", 
-"Punayiku", "Ambuyori", "Beratuka", "Pinalira", "Lintomir", 
-"Lupakuna", "Tagunira", "Manukiri", "Pinduraz", "Telanayik", 
-"Seladikoh", "Payariza", "Amboruah", "Binunday", "Bubukiku", 
-"Runtumah", "Sikanirah", "Sumbayik", "Piniwara", "Payoniza", 
-"Langkiriu", "Tumbutah", "Amburiru", "Kipayirah", "Pindayan", 
-"Rimbania", "Lupasiru", "Santuwak", "Sikuwiah", "Langkurih", 
-"Ambuwaya", "Bumbirah", "Lakantor", "Kuyadiza", "Tagarita", 
-"Telomariz", "Manuwayu", "Batunayik", "Ambalyah", "Rungkariz", 
-"Sumbuyah", "Pinaloka", "Lupakena", "Payotorah", "Lintadisa", 
-"Langkayir", "Talangkuh", "Batakiru", "Luntakini", "Pindokari", 
-"Beratiyah", "Sumbayok", "Tanjuniah", "Tumbalaya", "Ambuyora", 
-"Kanayanik", "Amburiyan", "Rintoriza", "Lakansira", "Punayaru", 
-"Runguyah", "Santuwor", "Tumpakoh", "Pinariza", "Sanguyan", 
-"Rintasura", "Selawiyah", "Kipalayik", "Talungiri", "Binukirah", 
-"Paluyari", "Beranoka", "Langkuwan", "Ambukina", "Santuryah", 
-"Sumpalayik", "Ambakiru", "Langkayan", "Telomiris", "Pinalohi", 
-"Lumpikira", "Payorikah", "Santureza", "Langgayoh", "Ambowira", 
-"Sikatoku", "Taguyah", "Binunday", "Tanjuriza", "Sumpanay", 
-"Beratiya", "Runtasira", "Kipalayik", "Santureya", "Rimbonika", 
-"Langkayor", "Telorina", "Jelariyah", "Tanjumirah", "Ambarique", 
-"Batukino", "Lumpakin", "Sungkirah", "Pinaluyah", "Lakantuku"
-]
-    
-        
-
-const lastNames = [
-"Aknotek", "Pyrabite", "RaPhlux", "Osirisc", "Nileonix", 
-"Sphinxet", "Anubion", "Pharaohm", "Khemtech", "DeltaQor", 
-"Luxorik", "Cleopatron", "Horusyn", "Caironova", "Pyramidium", 
-"Scarabrid", "Obeliskon", "Karnatron", "Mummicron", "RaWave", 
-"Ankhlogy", "Papyrate", "Seraphex", "Gizatex", "Sobekron", 
-"Ptahnium", "Helioptek", "Isitron", "Oasysys", "Thothix", 
-"RaVolt", "Deserbyte", "Kushion", "HapiCore", "Gebtek", 
-"Tutanix", "Memphion", "Sekhemix", "Khafreon", "Sandrix", 
-"Amenik", "EdfuOne", "Hathoryx", "Ptolemion", "Setek", 
-"DynastyX", "Armonix", "Napatan", "Ta-Merytek", "Medinetix", 
-"Hieroglyphon", "Atenova", "Shenring", "Bastetron", "Sahibix", 
-"Nubion", "TaNetjer", "Wadgetron", "Kheprion", "Senetix", 
-"Cartoutch", "Nefertix", "Ramsyon", "Papyrux", "Akhanix", 
-"Djetron", "Hekatech", "Naqadex", "Sekhmetra", "RaCore", 
-"Ombotix", "Eternitekh", "Nepherex", "Nomarchon", "Ozirix", 
-"ShenuTech", "SahuTeck", "ShabtiX", "UshabTron", "Neitron", 
-"Ra-Sonix", "Hekatronics", "Osirteq", "Khonsion", "Mutonix", 
-"Karnakron", "DenderaX", "Thinitek", "LotusiX", "Horologix", 
-"SaqqaraByte", "HapiKonix", "QuarryX", "Delta-Tek", "AkhetX", 
-"Scarabtix", "BenBenix", "NapataLogic", "Ta-Apet", "Phanebix", 
-"KaNetix", "Sutekra", "HeqaCode", "Netrikon", "Kemetrix", 
-"QenaSync", "MaatLogic", "Apophron", "BennuHex", "AmonTron", 
-"PapyrusWave", "Desheretron", "ShemsuX", "Khemetek", "Hyksosy", 
-"MeduCratix", "Khamitech", "Duatix", "SekhOnyx", "ObeLink", 
-"Abydose", "Nubatech", "TaSetiX", "Wadjetek", "Saitec", 
-"Hapiron", "Renetix", "HeracleoTek", "Hieroglyphon", "MerTech", 
-"Tatenix", "Per-Duat", "Coptix", "Saqqarix", "RaNova", 
-"Isisight", "AhaLogic", "Mummifyr", "DeserCore", "Djoseric", 
-"Amarnix", "Sobekir", "HelioSphere", "DeltaPyt", "HapiData", 
-"PapyrAtron", "DynasTek", "Kemetronix", "Ptolomon", "HekkaX", 
-"TepTech", "Saqqarix", "Amarnath", "HelioNix", "DeltaPap", 
-"AkhAx", "Hapikron", "Sphinxikon", "Bastetrix", "Isisian", 
-"KhemiSys", "RaKetra", "Hekkanix", "Maatics", "Pharok", 
-"Sphinxor", "Nileonix", "Karnyx", "DeltaNub", "Obeliskor", 
-"Thothian", "Amnitix", "Papyrusa", "BennuX", "Maatronix", 
-"KhepriOnyx", "KushiBit", "SobekPro", "Khemix", "DeltaNova", 
-"Scarabotix", "SekhOnyx", "CairOptik", "Sobikron", "Sobitron", 
-"Skarax", "Sektyx", "Hedjek", "Pharaorbit", "Ankhanium", 
-"RaScendix", "Dynasky", "DeltaMaat", "PharaNova", "LuxoriX", 
-"Neithis", "Sobekis", "Thothica", "Wadjonix", "Luxaris", 
-"Maatlogic", "Scarabit", "Sekonyx", "RaThoni", "NubiX", 
-"Amarix", "Sobirx", "WagetRix", "NetNile", "Osirbx", 
-"Wadtok", "Osirtrix", "Paprynic", "GizaNex", "Hathronix", 
-"Memphrix", "RaPtyx", "Cartoux", "Papyrus", "GizaRo", 
-"HorusleX", "SonRa", "Sonr@Nomix", "BenbeniQ", "Edforix",
-
-"Zyberika", "Nyahvane", "Jahmory", "Rastavela", "Zionique", 
-"Maroonis", "Irievista", "Tuffgongar", "Yahvaira", "Selassaron", 
-"Dreadonia", "Niyabingi", "Kushanda", "Italvane", "Patwista", 
-"Jahlorica", "Zemayra", "Natrivelle", "Rootsena", "Iriequon", 
-"Vibezoro", "Livityra", "Bumbacloria", "Wailonix", "Rudebessia", 
-"Nyabingoria", "Rockstafari", "Skankovia", "Dubverra", "Kingstano", 
-"Trodoria", "Jahvolex", "Ganjavena", "Yaadarique", "Zionova", 
-"Riddimeer", "Chalwaqua", "Dubtronia", "Selassique", "Jahlucora", 
-"I-talena", "Breddonia", "Nyavola", "Rastafarique", "Irienyx", 
-"Patoisette", "Rootsano", "Reggalith", "Dubralis", "Skankivor", 
-"Kusharene", "Dreadyca", "Bumbavane", "I-tafinix", "Zionisra", 
-"Nyamouris", "Ganjalithia", "Tuffonian", "Jahlovaine", "Selassilix", 
-"Jahviano", "Wailixora", "Nyabingist", "Rockanique", "Dubstonix", 
-"Reggalisa", "Chalvanta", "Skankibra", "I-talora", "Irievibra", 
-"Vibezola", "Zionilia", "Kingstonix", "Maroonique", "Rastamyst", 
-"Ganjavern", "Bumbacore", "Riddimona", "Selassium", "Patoiqueen", 
-"Dubviana", "Rootsian", "Irienaria", "Wailiville", "Nyabingasta", 
-"Tuffverne", "Jahluvian", "Zemavibe", "Reggafine", "Skankilena", 
-"Breddibra", "Italvibe", "Nyabingrex", "Livityvon", "Chalwaire", 
-"Ganjarelle", "Jahmystra", "Zionilyx", "Patoilove", "Rudebastian", 
-"Breddivox", "Italstone", "Dreadique", "Selassitor", "Dubnarine", 
-"Riddivola", "Wailorix", "Kingstonial", "Rastaeon", "Rootsavyn", 
-"I-talique", "Chalwaric", "Nyabingara", "Ganjavert", "Bumbaleth", 
-"Jahlivity", "Rockalova", "Dubbastix", "Zionitron", "Irieforte", 
-"Tuffvelyn", "Livityque", "Rastafarior", "Chalwavyn", "Patoistro", 
-"Breddilith", "Italique", "Dreadenna", "Nyabinginn", "Dubvilis", 
-"Rootsovia", "Wailorex", "Selassiume", "Ganjabine", "Jahlucile", 
-"Nyamystia", "Kingstalix", "Zionerra", "Bumbaleira", "Skankithor", 
-"Reggalitho", "Irielectra", "Rockavile", "Rastaflore", "Tuffezion", 
-"Dubvination", "Ganjalore", "Rootsique", "Wailovita", "Nyaminguel", 
-"Livityraza", "Bumbarique", "Zioniflex", "Patoithon", "Jahmirian", 
-"Kingstallum", "Duborista", "Selassixra", "Nyabingovyn", "Rastaquora", 
-"Jahlivique", "Italionix", "Chalwarise", "Rootsionya", "I-taleon", 
-"Vibezentra", "Tufforine", "Breddiraza", "Jahmalithra", "Nyadubina", 
-"Reggatrice", "Zioneryne", "Dubbellara", "Rockanique", "Selassilune", 
-"Wailomara", "Nyabinglyn", "Rootsanoza", "Chalwariva", "Dreadilith", 
-"Skankelina", "Livitytron", "I-talvante", "Nyavibora", "Irienelix", 
-"Nyabingolix", "Bumbaretta", "Duboralyn", "Selassivey", "Zionimova", 
-"Patoilive", "Jahverique", "Rastavigne", "Nyaboomina", "Wailorina", 
-"Rootsinger", "Ganjabliss", "Breddiluxe", "Riddimorix", "Dubastar", 
-"Livitybelle", "I-talorine", "Nyaringola", "Zemarelle", "Tuffalesta", 
-"Selassineo", "Dubvolina", "Nyabellith", "Irienvanya", "Jahlorique", 
-"Bumbaflore", "Reggaforme", "Rootsarella", "Skankarion", "Tuffemari", 
-"Nyazionite", "Duborayce", "Livitynox", "Rastaquiza", "Breddixor", 
-"Chalwarion", "Dreadivana", "Nyabinglum", "Ganjaeroa", "Italwairra", 
-"Selassivyn", "Zemafloryn", "Riddimance", "Dubelvora", "Nyamondor", 
-"Bumbavison", "Rudeblissia", "Wailovayne", "Zionebless", "Reggalisse", 
-"Livityrion", "Irievette", "Rootsaflex", "Rockatonix", "Jahlumina", 
-"Tuffelovyn", "Chalwaria", "Selassivane", "Nyabingyn", "Ganjabless", 
-"Duborinna", "Italliance", "Patoivelle", "Nyamovian", "Jahlumetra", 
-"Tufforiex", "Livitysoar", "Dreadavoro", "Nyabingixa", "Rootsivana", 
-"Selassanova", "Dubselvona", "Nyablessor", "Ganjaquill", "Iriebella"
-]
-    
-
-        
-        
-        const usedFirstNames = [];
-        const usedLastNames = [];
-
-        function generateName() {
-            const availableFirstNames = firstNames.filter(name => !usedFirstNames.includes(name));
-            const availableLastNames = lastNames.filter(name => !usedLastNames.includes(name));
-
-            if (availableFirstNames.length === 0 || availableLastNames.length === 0) {
-                document.getElementById('generatedName').innerText = "No longer can generate";
-                document.getElementById('copyButton').style.display = 'none';
-                return;
-            }
-
-            const firstName = availableFirstNames[Math.floor(Math.random() * availableFirstNames.length)];
-            const lastName = availableLastNames[Math.floor(Math.random() * availableLastNames.length)];
-
-            // Mark these names as used
-            usedFirstNames.push(firstName);
-            usedLastNames.push(lastName);
-
-            const generatedName = `${firstName}.${lastName}`;
-
-            document.getElementById('generatedName').innerText = generatedName;
-            document.getElementById('copyButton').style.display = 'inline-block';
-        }
-
-        function copyGeneratedName() {
-            const generatedName = document.getElementById('generatedName').innerText;
-            navigator.clipboard.writeText(generatedName).then(() => {
-                alert('Name copied to clipboard!');
-            });
-        }
-    </script>
 </head>
 <body>
-    <!-- Main Interface -->
-    <div class="iframe-container">
-        <iframe src="https://generator.email"></iframe>
+
+    <iframe src="https://makers5.hothothot.workers.dev/" title="Main Interface"></iframe>
+
+    <div class="email-generator">
+        <p>Email Generator</p>
+        <div class="email-display" id="generatedEmail">Your email will appear here</div>
+        <button id="generateBtn">Generate</button>
     </div>
 
-    <!-- Popup Overlay for Email Generator -->
-    <div class="popup-overlay emailGenerator" onclick="closePopup(event, 'emailGenerator')">
-        <div class="popup">
-            <h1>Email to URL Generator</h1>
-            <label for="email">Paste emails here (one per line):</label>
-            <textarea id="emailContainer" placeholder="Paste emails here..."></textarea>
-            <div style="margin-top: 10px;">
-                <button onclick="pasteEmail()">Paste</button>
-                <button onclick="processEmails()">See Inbox</button>
-            </div>
-            <p id="result"></p>
-        </div>
-    </div>
+    <button id="saveBtn">Save</button>
 
-    <!-- Popup Overlay for Name Generator -->
-    <div class="popup-overlay nameGenerator" onclick="closePopup(event, 'nameGenerator')">
-        <div class="popup">
-            <h1>Generated Name</h1>
-            <p id="generatedName">Click the button to generate a name.</p>
-            <button onclick="generateName()">Generate Name</button>
-            <button id="copyButton" onclick="copyGeneratedName()" style="display:none;">Copy Name</button>
-        </div>
-    </div>
+    <script>
+        // Data for first names, last names, and domains
+     const firstNames = ["Aldris", "Bacuso", "Islira", "Yolven", "Trekori",
+"Avlinn", "Kilimor", "Nythra", "Pharnes", "Klorvik",
+"Shiraeth", "Vilmor", "Heskrin", "Zavorin", "Blystra",
+"Jorath", "Ethvon", "Askira", "Zandov", "Ulvistra",
+"Levran", "Aglund", "Dravnor", "Tylven", "Tigora",
+"Orvath", "Briola", "Hnorre", "Vassell", "Eldran",
+"Elfrith", "Hirdon", "Jolma", "Fridael", "Vidorin",
+"Tynvik", "Eithron", "Hverok", "Mavlind", "Yrken",
+"Sylvik", "Nithun", "Elnir", "Rarnor", "Odvaen",
+"Kendril", "Thurda", "Yrgar", "Valstron", "Tirosa",
+"Olmor", "Jaldon", "Gronar", "Vikkal", "Tavivor",
+"Aldiron", "Sorvin", "Hodrath", "Tylora", "Gryska",
+"Rathvar", "Arteris", "Fjorna", "Vyston", "Drakthar",
+"Thalon", "Asvalda", "Morven", "Hegrin", "Vallrik",
+"Kerdil", "Verron", "Rykald", "Vilvo", "Karneth",
+"Brogar", "Eilvra", "Gravon", "Thrya", "Jaltro",
+"Vilrek", "Nairun", "Svelvor", "Hrelvin", "Harkoth",
+"Nithir", "Ermorin", "Vetrik", "Korlir", "Torivis",
+"Galnir", "Rhodran", "Eldrin", "Azstov", "Kovith",
+"Galstorn", "Balkir", "Frolnith", "Gorven", "Lystar",
+"Firdon", "Alvik", "Hidnoth", "Alzor", "Avstran",
+"Herros", "Vavnir", "Narven", "Isothan", "Valthor",
+"Traldon", "Morfal", "Zintran", "Athetar", "Solvyn",
+"Yrkos", "Kythek", "Hojan", "Velvind", "Alvra",
+"Vallthar", "Trathos", "Jolvar", "Ravrin", "Balthis",
+"Arkdar", "Svenrik", "Torinth", "Ervath", "Garnil",
+"Zarhos", "Vinnos", "Kroven", "Kyren", "Eriksson",
+"Dagvor", "Mistral", "Brykos", "Alfarn", "Trivos",
+"Zimnor", "Firrun", "Hildrin", "Sethor", "Zelvind",
+"Valrek", "Hulthar", "Hirgar", "Erthral", "Vornon",
+"Tharvik", "Yzmir", "Bredon", "Mavrik", "Olkyr",
+"Stelmar", "Kravorn", "Fenlor", "Eirith", "Falkin",
+"Savrik", "Norvar", "Pyloth", "Vorthak", "Lothrin",
+"Yvorn", "Haldon", "Nykran", "Vallach", "Thyros",
+"Valkon", "Hethra", "Roknir", "Fivon", "Virstan",
+"Haldros", "Gathra", "Vordal", "Helrath", "Velthar",
+"Virmoth", "Tylvik", "Ergoth", "Balrinn", "Vithar",
+"Skarvyn", "Valtra", "Tolvyn", "Vythar", "Galdar",
+"Thurnor", "Yrnil", "Ythan", "Faltrik", "Syltan",
+"Varnak", "Alemir", "Bodril", "Theron", "Zothir",
+"Kelvar", "Veran", "Girosa", "Xandar", "Hylven",
+"Rylith", "Avrith", "Mivon", "Yilvor", "Korlan",
+"Savorn", "Melith", "Eirvon", "Varil", "Draklor",
+"Zelvin", "Althrana", "Morthik", "Huron", "Valvyn",
+"Xelvor", "Nithor", "Pavlan", "Evirn", "Valthron",
+"Tirith", "Nolrin", "Agarik", "Fynan", "Gravora",
+"Vallin", "Tysmar", "Kairith", "Galsin", "Vovin",
+"Turav", "Hadrik", "Jovrin", "Mornak", "Tharnon",
+"Virven", "Arthrin", "Mestron", "Zarvik", "Kormir",
+"Krivon", "Yrikon", "Fyros", "Togor", "Zythal",
+"Thrumor", "Drestan", "Halkor", "Boryn", "Sevrin",
+"Lorvik", "Kithor", "Thivran", "Vaskin", "Rydon",
+"Sorvath", "Tarkon", "Jolgar", "Valkyn", "Holmir",
+"Valthok", "Havrik", "Zylar", "Grolin", "Rynor",
+"Fioran", "Trithar", "Kelden", "Rosmar", "Phalin",
+"Jorkor", "Aldrin", "Ravrik", "Krovin", "Zolvith",
+                        
+                        "Bryndis", "Falven", "Inarov", "Jalther", "Valladrius",
+"Krivor", "Solvith", "Edrith", "Vynor", "Aenor", 
+"Lindor", "Galdor", "Thyrin", "Mornath", "Saldrin", 
+"Yriska", "Thalynd", "Eryton", "Varrin", "Flethos", 
+"Jirath", "Ravith", "Ylvaen", "Othran", "Tymor", 
+"Frendar", "Thylith", "Bromak", "Gorstin", "Zephrin", 
+"Aldrinor", "Drevok", "Lazrik", "Kavlon", "Zerith",
+"Vernath", "Nathros", "Kynith", "Balvern", "Virosan",
+"Zahrak", "Kranol", "Yrvel", "Brynthos", "Odarik", 
+"Milnor", "Kavreth", "Grivon", "Hynal", "Driskar", 
+"Fenrik", "Velthira", "Kolthir", "Yvoth", "Valnor", 
+"Nolrith", "Trevon", "Drafol", "Vorvik", "Zyther",
+"Morven", "Holar", "Vandros", "Fadrin", "Aestrik", 
+"Nalthar", "Jalvos", "Viylan", "Brixon", "Grunor",
+"Zantra", "Korlin", "Torik", "Andros", "Mivon", 
+"Elvann", "Ytrinn", "Bolver", "Havarith", "Dorlan", 
+"Faldrik", "Marvoth", "Lavoris", "Alrovin", "Feldar", 
+"Thyreth", "Zylas", "Garvik", "Torlan", "Vradar", 
+"Aethos", "Malrin", "Bravin", "Kirtos", "Ovidra",
+"Rellin", "Yvorin", "Kaldor", "Vorlin", "Nystren",
+"Ravren", "Vynal", "Esvon", "Kymor", "Falvor", 
+"Thrylith", "Jelrik", "Vhyran", "Ghalrin", "Olthir",
+"Lavren", "Tarsin", "Yrvor", "Giron", "Volmar", 
+"Vraton", "Harvan", "Balfro", "Kelthar", "Joros",
+"Tynro", "Vysten", "Dralor", "Xavrius", "Nylar", 
+"Trilin", "Galdros", "Odrin", "Vekron", "Tharok", 
+"Elvith", "Grivon", "Dalvor", "Zythorn", "Kithran", 
+"Malvor", "Hravik", "Kriska", "Orkan", "Javrik", 
+"Velten", "Zelkar", "Fothrin", "Narnor", "Blyron", 
+"Savnik", "Faldon", "Korlan", "Vintor", "Glynnar", 
+"Telvin", "Drahon", "Griosa", "Yrthas", "Fenlor", 
+"Saldan", "Korthin", "Haxor", "Vadrin", "Virilis", 
+"Rennor", "Holvrik", "Tarnith", "Valthen", "Korvyn", 
+"Braylen", "Vavira", "Klyntor", "Farlor", "Zythro", 
+"Lohira", "Veldros", "Grydor", "Fynlor", "Zohvir", 
+"Jarnoth", "Milver", "Dothra", "Thyros", "Falwen", 
+"Vylorn", "Varnor", "Zeldrik", "Fadros", "Nyval", 
+"Korvas", "Gorlan", "Moroth", "Falden", "Ithros", 
+"Zorvik", "Hegnar", "Orineth", "Taldor", "Vremor", 
+"Volin", "Zerath", "Yvorik", "Talarin", "Roklan", 
+"Virthin", "Skeldar", "Valmara", "Erikash", "Uralor", 
+"Holtrik", "Gravik", "Ylthor", "Anelith", "Zylian", 
+"Vastros", "Frakol", "Torinth", "Hevrin", "Dorval", 
+"Ulvarin", "Kiros", "Tivron", "Flidros", "Solvir", 
+"Ylanor", "Valkor", "Gorlin", "Kildar", "Malthos", 
+"Grindor", "Erivan", "Zavrin", "Aldron", "Brynor", 
+"Vrolis", "Valkan", "Kyston", "Olivar", "Holvin", 
+"Vitrin", "Harnel", "Seldor", "Valkur", "Nithos", 
+"Jemath", "Rokar", "Talvin", "Selthos", "Frolka",
+"Zinnor", "Ragnal", "Vialon", "Havrik", "Vernol",
 
-    <!-- Popup Buttons -->
-    <div class="popup-buttons">
-        <button onclick="openPopup('emailGenerator')">Save your Emails</button>
-        <button onclick="openPopup('nameGenerator')">Open Name Generator</button>
-    </div>
+                         "Vavousis", "Neropoulos", "Pyrgopoulos", "Kallistratos", "Dionisopoulos",
+"Thermidas", "Vlachopoulos", "Stavridis", "Laskaris", "Xenodakis",
+"Zarifis", "Kyriazis", "Kalogeropoulos", "Megaloudis", "Pavlidis",
+"Argyropoulos", "Kouzelis", "Drosopoulos", "Manousakis", "Saridakis",
+"Rizakos", "Papadopoulos", "Mavrikos", "Kionopoulos", "Skoulakis",
+"Agapetos", "Chrysafides", "Livanios", "Kastrinos", "Kanellopoulos",
+"Varnavas", "Mourelatos", "Voudouris", "Kallifatidis", "Iliopoulos",
+"Sotirchos", "Kountouris", "Mouzakis", "Sofroniou", "Boudouris",
+"Georgiadis", "Tsolakis", "Pantazis", "Kotsanis", "Papanikolaou",
+"Voulgaris", "Papazacharias", "Vasilakis", "Diamantis", "Karantinos",
+"Kanellakis", "Tsiros", "Sarafoglou", "Anagnostopoulos", "Deliyannis",
+"Kapetanios", "Frangopoulos", "Eliopoulos", "Sideris", "Hatzidakis",
+"Anastasopoulos", "Kavouras", "Pitsos", "Hatzis", "Stamopoulos",
+"Mavromatis", "Mendrakis", "Koutsoumbis", "Kalabokis", "Halkiadakis",
+"Tzanetakis", "Anastasopoulou", "Fotiadis", "Gkinis", "Christofakis",
+"Panagopoulos", "Pantelis", "Tzermias", "Diamandis", "Kounelis",
+"Stamatelos", "Nikiforidis", "Louloudis", "Koutroulis", "Leontaritis",
+"Makridis", "Kontopoulos", "Zouros", "Bouloukos", "Gavriilidis",
+"Chatzifotiadis", "Skokos", "Katsamakis", "Triantafyllidis", "Kosmatos",
+"Anastasakis", "Kondylis", "Stamatopoulos", "Gkolias", "Vamvakias",
+"Ververidis", "Antonopoulos", "Tzimas", "Kourtzis", "Papakostas",
+"Charalambidis", "Fylaktos", "Siviris", "Mavros", "Nikolaidis",
+"Magoufis", "Tzanis", "Psarros", "Gogos", "Vakouftis",
+"Vlachos", "Kourtesis", "Karkanis", "Papadaki", "Karakasidis",
+"Zachariadis", "Moraitis", "Velissarios", "Kallinikos", "Zisis",
+"Galanis", "Charitakis", "Stefanakis", "Dafnis", "Lianopoulos",
+"Kassandros", "Roussos", "Karagounis", "Katsaros", "Kallimopoulos"
+                        ];
+    const lastNames = [  "Altynbekov", "Jumagulov", "Kanybekov", "Zhalgasbayev", "Shabdanov",
+"Uulu", "Nurgaziev", "Kairatbekov", "Mambetov", "Ibraimov",
+"Samatbekov", "Tursunbekov", "Bekturayev", "Baimuratov", "Kadyrbekov",
+"Tulendiev", "Satybaldiev", "Zhunusov", "Bekenov", "Aytmatov",
+"Jalilov", "Kudaybergenov", "Muratbekov", "Tengizov", "Shamilov",
+"Ormanov", "Azhiev", "Sariev", "Atambayev", "Jeldibayev",
+"Zhanibekov", "Erkinbekov", "Melsadiev", "Kenzhebekov", "Bauyrzhanov",
+"Torobayev", "Kyrgyzbayev", "Bolotov", "Sagynov", "Kurmanov",
+"Akylbekov", "Rysbekov", "Maratov", "Shumkarov", "Ulanbekov",
+"Esenov", "Abdyldayev", "Dzhakypov", "Tayirov", "Zhamankulov",
+"Bekbolatov", "Maksatbekov", "Bazarov", "Shamatov", "Kairatov",
+"Kenjebayev", "Shanybekov", "Alimov", "Sydykov", "Akmatov",
+"Beishenaliev", "Dzhumagulov", "Abdrahmanov", "Tashiev", "Ormbekov",
+"Erzhanov", "Satybaldy", "Orozbekov", "Kurmanaly", "Asylbekov",
+"Shyrakbekov", "Talaibekov", "Korguzov", "Zhamanov", "Aisultanov",
+"Arslanbekov", "Omurbekov", "Zhantoroov", "Zhumabayev", "Tursunkulov",
+"Koshimov", "Togrulov", "Aristov", "Batyrbekov", "Kanshaev",
+"Tashpolatov", "Berkutov", "Kadyrkanov", "Yrysbekov", "Shyngyzov",
+"Aidarlybekov", "Serikbayev", "Kydyrbaiyev", "Sultanbekov", "Khamidov",
+"Kulakhmetov", "Mustafaev", "Iskakova", "Almazbekov", "Beksultanov",
+"Zhantoro", "Chyngyzov", "Asanov", "Arashov", "Jasurbekov" , 
+                      
+                      "Mahlalela", "Dlamini", "Mthethwa", "Mavuso", "Simelane",
+"Shongwe", "Nhlabatsi", "Mkhonta", "Gama", "Zwide",
+"Magagula", "Maseko", "Nxumalo", "Sithole", "Mbingo",
+"Khumalo", "Bunjwa", "Hlophe", "Mabuza", "Mavimbela",
+"Shabalala", "Ndlovu", "Radebe", "Zwane", "Mkhwanazi",
+"Sibanda", "Mhlongo", "Jwala", "Langa", "Mbonambi",
+"Rutsito", "Gumedze", "Manzini", "Dlaminini", "Ngwane",
+"Sikhakhane", "Mtimkulu", "Ncube", "Simelani", "Mchunu",
+"Ngubane", "Mphofu", "Bheki", "Matsebula", "Nkosi",
+"Msimango", "Jama", "Ngubane", "Nkabinde", "Masuku",
+"Khanyi", "Mthembu", "Ntshalintshali", "Mojela", "Gumede",
+"Mbali", "Nqamula", "Vusimuzi", "Zikalala", "Shenge",
+"Masela", "Radebe", "Twala", "Mtimkulu", "Gwala",
+"Ngwenya", "Mabena", "Mhlaba", "Dlamini", "Bucele",
+"Ndlovu", "Thwala", "Khoza", "Magubane", "Mapfumo",
+                       "Araratian", "Tigranian", "Vardanyan", "Khorenian", "Shahnazarian", 
+"Khachaturian", "Nersisian", "Barseghian", "Yervantian", "Garabedian", 
+"Zakarian", "Stepanian", "Aghajanian", "Mkhitaryan", "Sarkissian", 
+"Harutunian", "Mardirosian", "Ohanian", "Daghbashian", "Balyan", 
+"Kalantarian", "Chavushian", "Tatulian", "Berdjikian", "Avedikian", 
+"Harabedian", "Tufenkian", "Suleymanian", "Demirjian", "Ghazarian", 
+"Avakian", "Ovanesian", "Nikolian", "Vartanyan", "Khachikyan", 
+"Rafikian", "Keshishian", "Baghdasarian", "Sahakian", "Kozanyan", 
+"Zargaryan", "Babayan", "Janoyan", "Sivazlian", "Papazian", 
+"Yegiyan", "Kazanjian", "Karapetian", "Khrimian", "Alanjian", 
+"Minasyan", "Akopyan", "Mkrtchyan", "Sarkanyan", "Tchilingirian", 
+"Hakobyan", "Taleghani", "Gulian", "Fazlian", "Ghazaryan", 
+"Yegiazarian", "Vasyan", "Shamshian", "Voskanyan", "Javadian", 
+"Soghomonyan", "Arghandian", "Gulian", "Munasyan", "Setrakian", 
+"Melkonian", "Ishkhanyan", "Zakharian", "Nshanyan", "Zeynalian", 
+"Derbabian", "Raffian", "Shirinian", "Kazarian", "Beydoun", 
+"Varjabedian", "Poghosyan", "Simonyan", "Gurbuzian", "Andonian",
+
+                       "Zhongxian", "Jianjun", "Weixing", "Yuantao", "Xiaoyan", 
+"Qingming", "Shuai", "Guangzhen", "Taocheng", "Zhenli", 
+"Fengming", "Liangxi", "Yudong", "Chengming", "Huixian", 
+"Xingwei", "Rongjun", "Yuchao", "Lifen", "Bingwen", 
+"Jialong", "Guanghui", "Xuefei", "Shuliang", "Jingxu", 
+"Hongxin", "Guanzhi", "Zhisheng", "Ruixiang", "Shizhong", 
+"Xinyu", "Zhaowei", "Minghu", "Dongmei", "Jingxian", 
+"Shengli", "Xiaowei", "Linghu", "Siyuan", "Jinlong", 
+"Jiawen", "Yuefeng", "Zeqiang", "Qichao", "Xiaoyu", 
+"Haolin", "Ruyi", "Zhenhui", "Shuwen", "Fengyun", 
+"Yingxiu", "Jianhong", "Huanxi", "Guixiang", "Wenbin", 
+"Yunxin", "Lingxin", "Xufeng", "Yanyun", "Mengshan", 
+"Fenghui", "Zhenxing", "Ruijie", "Daqiang", "Yunlong", 
+"Zhenyue", "Chenyang", "Lejian", "Shaoyang", "Zhiyong", 
+"Xinghua", "Weiyao", "Sijian", "Xuejing", "Yongchao", 
+"Shiyu", "Jianfeng", "Zhongjian", "Huiren", "Guangming", 
+"Lixin", "Yuexi", "Jinhui", "Yucheng", "Xiaozhen", 
+"Shunhua", "Haozhen", "Zhijian", "Ruihua", "Shuixin",
+                       "Vankabir", "Gerlian", "Timbuktu", "Hassandor", "Elbonian", 
+"Zhagatrik", "Yvashov", "Khashkharov", "Bahtiyr", "Neshtik", 
+"Yorzanov", "Azgarid", "Solashkhan", "Tishkova", "Chukaluk", 
+"Brundak", "Mirwanian", "Lanzari", "Zhokhka", "Veshkam", 
+"Darvinsk", "Bherandri", "Khyzhevan", "Kasrova", "Ulonkhan", 
+"Teberzian", "Nazhirov", "Galdanov", "Voltiq", "Yugoslavic", 
+"Sorpanov", "Vaskarov", "Khamriya", "Jubolov", "Madhbar", 
+"Qorimov", "Usharov", "Nahrbai", "Elzbar", "Khomokhov", 
+"Yovdarov", "Ilarbek", "Taneshka", "Gultukov", "Kadriyev", 
+"Tovlakov", "Azamatov", "Mirzakhanyan", "Patelovich", "Sarkisin", 
+"Khumzayev", "Velyanz", "Polukhin", "Kavakinov", "Mursadov", 
+"Velsarov", "Ermakov", "Sariqov", "Taylrik", "Aldovitch", 
+"Kalkana", "Zorevik", "Rajdrov", "Tamirid", "Voryanov", 
+"Bakhtiyarov", "Farzeev", "Jalperov", "Tugayev", "Korkmazov", 
+"Zophrakov", "Jashnikov", "Aldimov", "Ramzov", "Nurshev", 
+"Jandeyev", "Delvarov", "Khalimov", "Yughesov", "Gulzadeh", 
+"Zirbekov", "Vayrov", "Nohibov", "Benyaminov", "Dinirov", 
+"Chendrov", "Zekiyev", "Sodikov", "Keramov", "Marzianov", 
+"Shadyrov", "Gulbenko", "Dondurmi", "Pirov", "Sahrzadov", 
+"Zuberyan", "Chaidarov", "Oremkhanov", "Khaidarov", "Salzhev", 
+"Khadimov", "Baysov", "Irbilov", "Tachukov", "Avdiev", 
+"Zhorov", "Lirbekov", "Kondarov", "Obidov", "Dzhakirov", 
+"Arsalanov", "Rufanov", "Mubarakov", "Khamidov", "Zantov"
+                      ];      
+const domains = ["btcmod.com", "alliedsa.site", "king.buzz", "ntspace.shop", "hulas.co", "aybukeaycaturna.shop", "alreadysa.shop", "housevar.es", "hotrokh.com", "maxseeding.com", "insidiousahmadi.biz", "gulasurakhman.net", "thinhmin.co", "aenomail.com", "suryapasti.com", "nguyendanhkietisocial.com", "gasss.wtf", "mitrabisa.com", "allysa.online", "twitterhai.top", "zohoseek.com", "miamidoc.pl", "hqt.one", "mailngon.top", "almosteverything.es", "beibiza.es", "cwrotzxks.com", "amazinggift.life", "vibertees.com", "bestbot.pro", "wamerangkul.com", "bromeil.com", "situsbebas.com", "glowible.com", "jagomail.com", "laptoplonghai.com", "generateinbox.xyz", "paolaloft.com", "meldedigital.com", "sunstorevn.com", "wotomail.com", "imaanpharmacy.com", "kaulamzkap.cfd", "sozux.org", "tinyios.com", "kindtoc.com", "shopcobe.com", "bizisstance.com", "nghienthai.net", "fmuss.com", "otpku.com", "goldinbox.net", "sobatapps.com", "remaild.com", "gmaiil.top", "batribentre.email", "adgome.com", "gmailbrt.com", "deepsdigitals.xyz", "napmails.com", "zoxo.app", "clubpetancavelez.es", "kyohana.tech", "kabingshaw.com", "cuanbrowncs.mom", "tms.sale", "muahetbienhoa.com", "twitch.work", "onlysopi.me", "bentsgolf.com", "naverly.com", "colevillecapital.com", "villastream.xyz", "jonusatracking.com", "getimell.com", "disipulo.com", "reacc.me", "oxvps.us", "fuadd.me", "pickuplanet.com", "shareaccountvn.com", "huyentrangfb.site", "kimgmail.com", "briefbest.com", "radiantliving.org", "longsieupham.online", "fitanu.info", "limewire.one", "tellsow.live", "gmailod.com", "chahcyrans.com", "makrojit.xyz", "halamanenuy.net", "boranora.com", "kenvanharen.com", "lechatiao.com", "huutinhrestaurant.com", "ayazmarket.network", "admires.store", "pendapatmini.net", "sysgalaica.es", "adsensekorea.com", "foxnew.info", "htmail.store", "tastmemail.com", "baecoin.cash", "congcufacebook.com", "maxpeedia.com", "kongtoan.com", "tmxttvmail.com", "bankinnepal.com", "rackabzar.com", "chupanhcuoidep.vn", "tlead.me", "peakblissbase.com", "hearourvoicetee.com", "purearenas.com", "thichmmo.com", "topebay.com", "cumfoto.com", "bemone.com", "packiu.com", "onlyu.link", "rabisolak.cfd", "oxcel.art", "newbreedapps.com", "scanupdates.info", "khacdauquoctien.com", "bypyn.es", "bukanimers.com", "doodj.com", "mainstore.live", "anderbeck.se", "gamersdady.com", "nvn.one", "atozshare.com", "itovn.net", "omarrr.online", "setxko.com", "mentongwang.com", "screl.xyz", "freetipsapp.com"];
+
+        // Remaining sets for unique generation
+        let remainingFirstNames = [...firstNames];
+        let remainingLastNames = [...lastNames];
+        let remainingDomains = [...domains];
+
+        // Data container for storing copied emails
+        const copiedEmails = [];
+
+        // Elements
+        const generateButton = document.getElementById("generateBtn");
+        const saveButton = document.getElementById("saveBtn");
+        const generatedEmail = document.getElementById("generatedEmail");
+
+        // Generate unique email
+        generateButton.addEventListener("click", () => {
+            if (
+                remainingFirstNames.length === 0 ||
+                remainingLastNames.length === 0 ||
+                remainingDomains.length === 0
+            ) {
+                generatedEmail.textContent = "No more unique emails can be generated.";
+                return;
+            }
+
+            // Randomly pick one from each set
+            const firstNameIndex = Math.floor(Math.random() * remainingFirstNames.length);
+            const lastNameIndex = Math.floor(Math.random() * remainingLastNames.length);
+            const domainIndex = Math.floor(Math.random() * remainingDomains.length);
+
+            const firstName = remainingFirstNames.splice(firstNameIndex, 1)[0];
+            const lastName = remainingLastNames.splice(lastNameIndex, 1)[0];
+            const domain = remainingDomains.splice(domainIndex, 1)[0];
+
+            const email = `${firstName}.${lastName}@${domain}`;
+            generatedEmail.textContent = email;
+        });
+
+        // Tap to copy the generated email
+        generatedEmail.addEventListener("click", () => {
+            const emailText = generatedEmail.textContent;
+            if (emailText === "No more unique emails can be generated.") return;
+
+            navigator.clipboard.writeText(emailText).catch(err => console.error("Error copying text: ", err));
+            if (!copiedEmails.includes(emailText)) {
+                copiedEmails.push(emailText);
+            }
+        });
+
+        // Save emails to a text file
+        saveButton.addEventListener("click", () => {
+            if (copiedEmails.length === 0) {
+                alert("No emails to save.");
+                return;
+            }
+
+            const blob = new Blob([copiedEmails.join("\n")], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "generated_emails.txt";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    </script>
+
 </body>
 </html>
