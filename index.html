@@ -366,10 +366,8 @@ const domains = ["btcmod.com", "alliedsa.site", "king.buzz", "ntspace.shop", "hu
 
             const email = `${firstName}.${lastName}@${domain}`;
             generatedEmail.textContent = email;
-        });
 
-        // Tap to copy the generated email
-        generatedEmail.addEventListener("click", () => {
+
             const emailText = generatedEmail.textContent;
             if (emailText === "No more unique emails can be generated.") return;
 
@@ -377,6 +375,11 @@ const domains = ["btcmod.com", "alliedsa.site", "king.buzz", "ntspace.shop", "hu
             if (!copiedEmails.includes(emailText)) {
                 copiedEmails.push(emailText);
             }
+        });
+
+        // Tap to copy the generated email
+        generatedEmail.addEventListener("click", () => {
+            
         });
 
         // Save emails to a text file
